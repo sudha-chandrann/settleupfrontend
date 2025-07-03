@@ -7,14 +7,18 @@ import {
   Image, 
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useRouter } from "expo-router";
 
 export default function Index() {
+ const router= useRouter();
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      router.push("/(auth)/welcome");
+    }, 1000);
 
- useEffect(()=>{
-  setTimeout(() => {
-    
-  }, 1000);
- },[])
+    return () => clearTimeout(timeout);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>

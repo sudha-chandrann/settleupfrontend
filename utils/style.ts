@@ -1,4 +1,4 @@
-import { Dimensions } from 'react-native';
+import { Dimensions, PixelRatio } from 'react-native';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
@@ -10,19 +10,19 @@ const scaleHeight = screenHeight / baseHeight;
 const scale = Math.min(scaleWidth, scaleHeight);
 
 export const responsiveFontSize = (fontSize: number): number => {
-  return Math.round(fontSize * scale);
+  return Math.round(PixelRatio.roundToNearestPixel(fontSize * scale));
 };
 
 export const responsiveSpacing = (size: number): number => {
-  return Math.round(size * scale);
+  return Math.round(PixelRatio.roundToNearestPixel(size * scale));
 };
 
 export const responsiveWidth = (value: number): number => {
-  return Math.round(value * scaleWidth);
+  return Math.round(PixelRatio.roundToNearestPixel(value * scaleWidth));
 };
 
 export const responsiveHeight = (value: number): number => {
-  return Math.round(value * scaleHeight);
+  return Math.round(PixelRatio.roundToNearestPixel(value * scaleHeight));
 };
 
 export const fontSize = {
@@ -31,6 +31,8 @@ export const fontSize = {
   md: responsiveFontSize(16),
   lg: responsiveFontSize(20),
   xl: responsiveFontSize(24),
+  '2xl': responsiveFontSize(28)
+
 };
 
 export const spacing = {
