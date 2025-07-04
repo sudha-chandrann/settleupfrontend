@@ -22,6 +22,9 @@ import { colortheme } from "@/utils/theme";
 import { EyeClosedIcon, EyeIcon, UserCircleIcon } from "phosphor-react-native";
 import { useRouter } from "expo-router";
 import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
+import { ErrorState, ErrorType } from "@/utils/type";
+import { authService } from "@/services/service";
+import ToastMessage from "@/components/ToastMessage";
 
 interface FormData {
   email: string;
@@ -43,7 +46,32 @@ const LoginScreen: React.FC = () => {
   const [errors, setErrors] = useState<FormErrors>({});
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [toastState, settoastState] = useState<ErrorState>({
+    visible: false,
+    message: "",
+    type: "error",
+  });
 
+
+    const showtoastMessage = (
+      message: string,
+      type: ErrorType = "error",
+      title?: string
+    ) => {
+      settoastState({
+        visible: true,
+        message,
+        type,
+        title,
+      });
+    };
+  
+    const hidetoastMessage = () => {
+      settoastState((prev) => ({
+        ...prev,
+        visible: false,
+      }));
+    };
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
 
@@ -80,14 +108,43 @@ const LoginScreen: React.FC = () => {
     setIsLoading(true);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-    } catch (error: any) {
-      console.log(" the login error:", error);
-      setErrors({
-        general:
-          error.message ||
-          "Login failed. Please check your connection and try again.",
+      const response = await authService.login({
+        email: formData.email,
+        password: formData.password,
       });
+      if (response.success) {
+        showtoastMessage(response.message, "success", "Success");
+        setTimeout(() => {
+
+        }, 1000);
+        setFormData({
+          email: "",
+          password: "",
+        });
+      }
+       else {
+        showtoastMessage(
+          response.message ||   "Login failed. Please check your connection and try again.",
+          "error",
+          "Login Error"
+        );
+        if (response.errors) {
+          const newErrors: FormErrors = {};
+
+          response.errors.map((error) => {
+            if (error.path[0] === "email") newErrors.email = error?.message;
+            else if (error.path[0] === "password") newErrors.password = error?.message;
+            else newErrors.general = error.message
+          });
+          setErrors(newErrors);
+        }
+      }
+    } catch (error: any) {
+        showtoastMessage(
+          error.message ||   "Login failed. Please check your connection and try again.",
+          "error",
+          "Login Error"
+        );
     } finally {
       setIsLoading(false);
     }
@@ -105,7 +162,6 @@ const LoginScreen: React.FC = () => {
     );
   };
 
-
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar
@@ -117,6 +173,15 @@ const LoginScreen: React.FC = () => {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.keyboardAvoidingView}
       >
+        <ToastMessage
+          visible={toastState.visible}
+          message={toastState.message}
+          type={toastState.type}
+          title={toastState.title}
+          onClose={hidetoastMessage}
+          autoHide={toastState.type === "success"}
+          autoHideDuration={2000}
+        />
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
@@ -127,8 +192,8 @@ const LoginScreen: React.FC = () => {
               style={styles.logoContainer}
             >
               <View style={styles.logoCircle}>
-                  <UserCircleIcon color="white" size={'100%'}/>
-               </View>
+                <UserCircleIcon color="white" size={"100%"} />
+              </View>
             </Animated.View>
             <Animated.View
               entering={FadeInDown.duration(800).delay(200)}
@@ -224,7 +289,7 @@ const LoginScreen: React.FC = () => {
                   {isLoading ? "Signing In..." : "Login"}
                 </Text>
               </TouchableOpacity>
-               
+
               <View style={styles.signupLinkContainer}>
                 <Text style={styles.signupLinkText}>
                   Don&apos;t have an account?{" "}
@@ -234,7 +299,6 @@ const LoginScreen: React.FC = () => {
                 </TouchableOpacity>
               </View>
             </Animated.View>
-
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -270,7 +334,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-
 
   header: {
     marginBottom: responsiveSpacing(36),
@@ -382,7 +445,7 @@ const styles = StyleSheet.create({
     marginTop: spacing.lg,
   },
   signupLinkText: {
-    fontSize:  responsiveFontSize(14),
+    fontSize: responsiveFontSize(14),
     color: colortheme.text.secondary,
   },
   signupLink: {
@@ -391,4 +454,5 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
 });
+
 export default LoginScreen;
