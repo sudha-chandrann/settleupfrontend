@@ -150,7 +150,6 @@ const SignupScreen: React.FC = () => {
         );
         if (response.errors) {
           const newErrors: FormErrors = {};
-
           response.errors.map((error) => {
             if (error.path[0] === "email") newErrors.email = error?.message;
             else if (error.path[0] === "password")
@@ -160,7 +159,6 @@ const SignupScreen: React.FC = () => {
           });
           setErrors(newErrors);
         }
-        console.log(" the login falied :", response.errors);
       }
     } catch (error: any) {
       showtoastMessage(

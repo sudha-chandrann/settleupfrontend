@@ -4,7 +4,7 @@ import { ApiError, AuthResponse, LoginData, RegisterData, User } from '@/utils/t
 
 
 const CONFIG = {
-  API_BASE_URL:  'http://10.225.96.79:3000/api/v1' ,
+  API_BASE_URL: 'http://10.225.96.79:3000/api/v1',
   TOKEN_KEY: 'auth_token',
   USER_KEY: 'user_data',
   REQUEST_TIMEOUT: 10000,
@@ -82,7 +82,7 @@ class AuthService {
   async login(data: LoginData): Promise<AuthResponse> {
     try {
       const response = await this.apiClient.post<AuthResponse>('/users/auth/login', data);
-      
+
       if (response.data.success && response.data.data) {
         await this.storeAuthData(response.data.data.token, response.data.data.user);
       }
@@ -93,6 +93,29 @@ class AuthService {
     }
   }
 
+  async requestEmailVerificationCode(data: { email: string }): Promise<AuthResponse> {
+    try {
+      const response = await this.apiClient.post<AuthResponse>(
+        '/users/auth/send-verification-code',
+        data
+      );
+      return response.data;
+    } catch (error) {
+      return this.handleError(error, 'Failed to send verification code.');
+    }
+  }
+
+  async confirmEmailVerification(data: { email: string; code: string }): Promise<AuthResponse> {
+    try {
+      const response = await this.apiClient.post<AuthResponse>(
+        '/users/auth/verify-email',
+        data
+      );
+      return response.data;
+    } catch (error) {
+      return this.handleError(error, 'Email verification failed.');
+    }
+  }
 
   async logout(): Promise<void> {
     try {
@@ -187,7 +210,7 @@ class AuthService {
 
     if (isAxiosError(error)) {
       const axiosError = error as AxiosError<ApiError>;
-      
+
       if (axiosError.response?.data) {
         return {
           success: false,
@@ -196,7 +219,7 @@ class AuthService {
           timestamp: new Date().toISOString(),
         };
       }
-      
+
       if (axiosError.code === 'ECONNABORTED') {
         return {
           success: false,
@@ -204,7 +227,7 @@ class AuthService {
           timestamp: new Date().toISOString(),
         };
       }
-      
+
       if (axiosError.message === 'Network Error') {
         return {
           success: false,
@@ -220,6 +243,7 @@ class AuthService {
       timestamp: new Date().toISOString(),
     };
   }
+  
 }
 
 

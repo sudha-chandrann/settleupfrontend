@@ -274,6 +274,11 @@ const LoginScreen: React.FC = () => {
                     Forgot Password?
                   </Text>
                 </TouchableOpacity>
+                <TouchableOpacity onPress={()=>{router.push('/(auth)/verfication')}}>
+                  <Text style={styles.forgotPasswordText}>
+                    Email Verification
+                  </Text>
+                </TouchableOpacity>
               </View>
 
               <TouchableOpacity
@@ -411,7 +416,7 @@ const styles = StyleSheet.create({
 
   optionsContainer: {
     flexDirection: "row",
-    justifyContent: "flex-end",
+    justifyContent: "space-between",
     alignItems: "center",
     marginBottom: spacing.xl,
   },
