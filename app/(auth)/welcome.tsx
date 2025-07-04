@@ -14,7 +14,7 @@ import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 
 const WelcomeScreen: React.FC = () => {
   const router = useRouter();
-
+  
   const handleGetStarted = () => {
     router.push("/signup");
   };

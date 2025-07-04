@@ -560,10 +560,10 @@ const EmailVerificationScreen: React.FC = () => {
             {currentStep === "email" ? renderEmailStep() : renderVerificationStep()}
 
             <View style={styles.backToContainer}>
-              <TouchableOpacity onPress={()=>router.push('/(auth)/signup')}>
+              <TouchableOpacity onPress={()=>router.replace('/(auth)/signup')}>
                 <Text style={styles.backToLoginLink}>Back to Signup</Text>
               </TouchableOpacity>
-               <TouchableOpacity onPress={()=>router.push('/(auth)/signup')}>
+               <TouchableOpacity onPress={()=>router.replace('/(auth)/signup')}>
                 <Text style={styles.backToLoginLink}>Back to Login</Text>
               </TouchableOpacity>
             </View>
@@ -592,7 +592,6 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.lg,
   },
   
-  // Step Indicator Styles
   stepIndicator: {
     flexDirection: "row",
     alignItems: "center",
@@ -719,7 +718,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   
-  // Email Step Styles
   inputGroup: {
     marginBottom: spacing.xl,
   },
@@ -762,7 +760,6 @@ const styles = StyleSheet.create({
     lineHeight: fontSize.sm * 1.4,
   },
   
-  // Verification Step Styles
   codeInputContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -823,7 +820,6 @@ const styles = StyleSheet.create({
     marginLeft: spacing.xs,
   },
   
-  // Common Button Styles
   submitButton: {
     backgroundColor: colortheme.primary.main,
     borderRadius: 14,

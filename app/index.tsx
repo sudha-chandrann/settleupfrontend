@@ -8,17 +8,24 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
+import { useAuth } from "@/hooks/auth";
 
 export default function Index() {
  const router= useRouter();
+ const {isAuthenticated}= useAuth();
   useEffect(() => {
     const timeout = setTimeout(() => {
+      if(isAuthenticated){
+        router.replace('/(dashboard)')
+      }
+      else{
       router.push("/(auth)/welcome");
+      }
     }, 1000);
 
     return () => clearTimeout(timeout);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isAuthenticated]);
 
   return (
     <SafeAreaView style={styles.container}>

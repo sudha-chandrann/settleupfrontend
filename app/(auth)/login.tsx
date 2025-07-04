@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, {  useState } from "react";
 import {
   View,
   Text,
@@ -25,6 +25,7 @@ import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 import { ErrorState, ErrorType } from "@/utils/type";
 import { authService } from "@/services/service";
 import ToastMessage from "@/components/ToastMessage";
+import { useAuth } from "@/hooks/auth";
 
 interface FormData {
   email: string;
@@ -51,27 +52,27 @@ const LoginScreen: React.FC = () => {
     message: "",
     type: "error",
   });
+  const {  setUser, setIsAuthenticated } = useAuth();
 
+  const showtoastMessage = (
+    message: string,
+    type: ErrorType = "error",
+    title?: string
+  ) => {
+    settoastState({
+      visible: true,
+      message,
+      type,
+      title,
+    });
+  };
 
-    const showtoastMessage = (
-      message: string,
-      type: ErrorType = "error",
-      title?: string
-    ) => {
-      settoastState({
-        visible: true,
-        message,
-        type,
-        title,
-      });
-    };
-  
-    const hidetoastMessage = () => {
-      settoastState((prev) => ({
-        ...prev,
-        visible: false,
-      }));
-    };
+  const hidetoastMessage = () => {
+    settoastState((prev) => ({
+      ...prev,
+      visible: false,
+    }));
+  };
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
 
@@ -114,17 +115,22 @@ const LoginScreen: React.FC = () => {
       });
       if (response.success) {
         showtoastMessage(response.message, "success", "Success");
-        setTimeout(() => {
+        if (response.data) {
+          setUser(response.data.user);
+          setIsAuthenticated(true);
+        }
 
+        setTimeout(() => {
+          router.replace('/(dashboard)')
         }, 1000);
         setFormData({
           email: "",
           password: "",
         });
-      }
-       else {
+      } else {
         showtoastMessage(
-          response.message ||   "Login failed. Please check your connection and try again.",
+          response.message ||
+            "Login failed. Please check your connection and try again.",
           "error",
           "Login Error"
         );
@@ -133,18 +139,20 @@ const LoginScreen: React.FC = () => {
 
           response.errors.map((error) => {
             if (error.path[0] === "email") newErrors.email = error?.message;
-            else if (error.path[0] === "password") newErrors.password = error?.message;
-            else newErrors.general = error.message
+            else if (error.path[0] === "password")
+              newErrors.password = error?.message;
+            else newErrors.general = error.message;
           });
           setErrors(newErrors);
         }
       }
     } catch (error: any) {
-        showtoastMessage(
-          error.message ||   "Login failed. Please check your connection and try again.",
-          "error",
-          "Login Error"
-        );
+      showtoastMessage(
+        error.message ||
+          "Login failed. Please check your connection and try again.",
+        "error",
+        "Login Error"
+      );
     } finally {
       setIsLoading(false);
     }
@@ -274,7 +282,11 @@ const LoginScreen: React.FC = () => {
                     Forgot Password?
                   </Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={()=>{router.push('/(auth)/verfication')}}>
+                <TouchableOpacity
+                  onPress={() => {
+                    router.push("/(auth)/verfication");
+                  }}
+                >
                   <Text style={styles.forgotPasswordText}>
                     Email Verification
                   </Text>

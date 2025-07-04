@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
-import {  LoginData, RegisterData, User } from '@/utils/type';
+import {  LoginData, User } from '@/utils/type';
 import { authService } from '@/services/service';
+import { useRouter } from 'expo-router';
 
 export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-
+  const router= useRouter();
   useEffect(() => {
     checkAuthStatus();
   }, []);
@@ -42,27 +43,11 @@ export const useAuth = () => {
     return response;
   };
 
-  const register = async (data: RegisterData) => {
-    const response = await authService.register(data);
-    if (response.success && response.data) {
-      setUser(response.data.user);
-      setIsAuthenticated(true);
-    }
-    return response;
-  };
-
   const logout = async () => {
     await authService.logout();
     setUser(null);
     setIsAuthenticated(false);
-  };
-
-  const updateProfile = async (data: { name?: string; avatar?: string }) => {
-    const response = await authService.updateUserProfile(data);
-    if (response.success && response.data) {
-      setUser(response.data.user);
-    }
-    return response;
+    router.replace('/(auth)/login');
   };
 
   return {
@@ -70,9 +55,9 @@ export const useAuth = () => {
     isLoading,
     isAuthenticated,
     login,
-    register,
     logout,
-    updateProfile,
     checkAuthStatus,
+    setUser,
+    setIsAuthenticated
   };
 };
