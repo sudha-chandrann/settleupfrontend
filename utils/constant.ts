@@ -31,3 +31,4 @@ export const generateColorFromName = (name: string): string => {
   
   return colors[Math.abs(hash) % colors.length];
 };
+
